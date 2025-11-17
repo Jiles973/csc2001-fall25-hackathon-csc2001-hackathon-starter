@@ -1,22 +1,133 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CSC2001 Mini Hackathon</title>
-  <link rel="stylesheet" href="./style.css" />
-</head>
-<body>
-  <main class="container">
-    <h1>Mini Hackathon</h1>
-    <p>Build something with HTML + CSS + JS + an API!</p>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dictionary App</title>
 
-    <section id="app">
-      <button id="actionBtn">Get Data</button>
-      <pre id="output">Click the button to fetch data…</pre>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background: #ff0000;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    main {
+      max-width: 600px;
+      margin: 40px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      animation: fadeIn 0.6s ease-in-out;
+    }
+
+    
+
+    .search-box {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    input {
+      flex: 1;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 12px 20px;
+      background: #ff0000;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+      font-size: 16px;
+      transition: 0.3s;
+    }
+
+   
+    .result {
+      margin-top: 20px;
+    }
+
+    .word {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .definition {
+      margin-top: 10px;
+      font-size: 18px;
+      line-height: 1.5;
+    }
+
+    .error {
+      color: red;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1> Mini Dictionary App</h1>
+  </header>
+
+  <main>
+    <section class="search-box">
+      <input id="wordInput" type="text" placeholder="Type a word...">
+      <button id="searchBtn">Search</button>
     </section>
+
+    <section id="output"></section>
   </main>
 
-  <script src="./script.js"></script>
+  <script>
+    document.getElementById("searchBtn").addEventListener("click", () => {
+      const word = document.getElementById("wordInput").value.trim();
+      const output = document.getElementById("output");
+
+      if (!word) {
+        output.innerHTML = `<p class='error'>Please enter a word!</p>`;
+        return;
+      }
+
+      fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.title === "No Definitions Found") {
+            output.innerHTML = `<p class='error'>No definition found for "${word}".</p>`;
+            return;
+          }
+
+          const meaning = data[0].meanings[0].definitions[0].definition;
+
+          output.innerHTML = `
+            <div class="result">
+              <p class="word">${word}</p>
+              <p class="definition">${meaning}</p>
+            </div>
+          `;
+        })
+        .catch(error => {
+          output.innerHTML = `<p class="error">Error fetching data. Please try again.</p>`;
+        });
+    });
+  </script>
+
 </body>
 </html>
